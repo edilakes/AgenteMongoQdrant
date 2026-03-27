@@ -68,6 +68,26 @@ Un agente inteligente diseñado para interactuar con bibliotecas de documentos a
 - [x] Fase 4: Interfaz de Usuario (Web).
 - [/] Fase 5: Indexación Semántica con Qdrant (En progreso).
 
+## 📄 Documentación Consolidada
+
+Para una visión detallada de la evolución y arquitectura del proyecto, consulta los siguientes documentos en la carpeta `docs/`:
+
+### Estrategia y Arquitectura Core
+- [Estrategia de Meta-Contexto Puro](docs/plan_pure_context_strategy.md): Diseño de la Capa de Direccionamiento Semántico.
+- [Walkthrough de Implementación Pure Context](docs/walkthrough_pure_context_strategy.md): Resultados de la orquestación semántica.
+- [Resumen de Capacidades](docs/capabilities_summary.md): Qué puede hacer el agente actualmente.
+- [Detalles Técnicos del Indexador](docs/details_pure_context.md): Cómo funciona el `ContextGenerator`.
+
+### Infraestructura y Datos
+- [Extracción de Metadatos (Itheca)](docs/plan_metadata_extraction.md): Pipeline de procesamiento de documentos HTML.
+- [Walkthrough de Datos](docs/walkthrough_metadata_extraction.md): Resultados de la migración de 10k+ documentos.
+- [Dockerización de Embeddings](docs/plan_dockerizing_embeddings.md): Microservicio para el modelo `multilingual-e5-large`.
+- [Arquitectura RAG Final](docs/walkthrough_dockerizing_embeddings.md): Reporte de infraestructura completada.
+
+### Gestión del Repositorio
+- [Plan de GitHub y README](docs/plan_github_and_readme.md): Inicialización del repo y documentación raíz.
+- [Walkthrough de Subida a GitHub](docs/walkthrough_github_and_readme.md): Verificación de la sincronización remota.
+
 ---
 
 ## 📄 Licencia
