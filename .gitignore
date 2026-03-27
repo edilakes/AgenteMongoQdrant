@@ -1,0 +1,47 @@
+# Environment
+.env
+.env.local
+.env.*
+
+# Dependencies
+node_modules/
+jspm_packages/
+typings/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+test_api.py
+*.log
+docker-compose.yml-draft
+client_methods.txt
+brain/
+.gemini/

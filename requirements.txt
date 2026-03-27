@@ -1,0 +1,18 @@
+# Core dependencies
+fastapi
+uvicorn
+python-dotenv
+
+# MCP SDK
+mcp[cli]
+
+# Data Sources
+pymongo
+qdrant-client
+sqlalchemy
+psycopg2-binary
+beautifulsoup4
+
+# Async support
+httpx
+aiohttp
