@@ -13,6 +13,6 @@ sqlalchemy
 psycopg2-binary
 beautifulsoup4
 
-# Async support
-httpx
-aiohttp
+# AI and Embeddings
+google-generativeai
+fastembed

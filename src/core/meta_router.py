@@ -1,7 +1,7 @@
 import os
 import httpx
 from qdrant_client import QdrantClient
-from fastembed import TextEmbedding
+import google.generativeai as genai
 from pymongo import MongoClient
 from bson import ObjectId
 
@@ -9,7 +9,7 @@ class MetaRouter:
     """
     Orquestador que utiliza Qdrant para determinar qué herramientas 
     y qué fuentes de datos son necesarias para responder una consulta.
-    Usa un Adaptador Nativo para MongoDB para mayor estabilidad.
+    Sincronizado con Gemini Embeddings para paridad con n8n.
     """
     
     def __init__(self, mcp_manager=None):
@@ -21,16 +21,23 @@ class MetaRouter:
         # Conexión nativa a MongoDB (Fallback estable)
         self.mongo_client = MongoClient(os.getenv("MONGO_URL"))
 
-        try:
-            self.encoder = TextEmbedding(model_name="intfloat/multilingual-e5-large")
-        except Exception as e:
-            print(f"Error cargando modelo de embeddings: {e}")
-            self.encoder = None
+        # Configuración Google Gemini
+        api_key = os.getenv("GEMINI_API_KEY")
+        genai.configure(api_key=api_key)
+        self.embedding_model = "models/gemini-embedding-001"
 
     def _get_vector(self, text: str):
-        if not self.encoder:
+        """Genera embedding usando la API de Gemini."""
+        try:
+            result = genai.embed_content(
+                model=self.embedding_model,
+                content=text,
+                task_type="retrieval_query" # Cambio a 'query' para el router
+            )
+            return result['embedding']
+        except Exception as e:
+            print(f"Error generando embedding en router: {e}")
             return None
-        return list(self.encoder.embed([text]))[0].tolist()
 
     async def route_query(self, query: str):
         """Analiza la query buscando en el 'context_map'."""
@@ -44,6 +51,7 @@ class MetaRouter:
         if self.qdrant_api_key:
             headers["api-key"] = self.qdrant_api_key
         
+        # Sincronizado con el nuevo espacio vectorial de Gemini
         payload = {"vector": vector, "limit": 2, "with_payload": True}
         
         try:
@@ -51,7 +59,8 @@ class MetaRouter:
                 res = await client.post(url, json=payload, headers=headers)
                 if res.status_code == 200:
                     results = res.json().get("result", [])
-                    if results and results[0]["score"] > 0.7:
+                    # Umbral de confianza ajustado para Gemini Embeddings
+                    if results and results[0]["score"] > 0.65: 
                         hit = results[0]
                         payload = hit["payload"]
                         print(f"✅ Ruta encontrada: {payload.get('text')}")
@@ -68,7 +77,7 @@ class MetaRouter:
         # 2. Fallback: Búsqueda general en la biblioteca si no hay puntero específico
         plan = {
             "action": "qdrant_search",
-            "collection": "doctrina_itheca",
+            "collection": "doctrina_itheca", # Colección general
             "query": query
         }
         return self._clean_doc(plan)
@@ -81,7 +90,7 @@ class MetaRouter:
             return [self._clean_doc(v) for v in doc]
         elif isinstance(doc, (str, int, float, bool)) or doc is None:
             return doc
-        return str(doc) # Cualquier otra cosa (ObjectId, datetime, etc) -> string
+        return str(doc)
 
     async def execute_plan(self, plan: dict):
         """Ejecuta la acción decidida por el router."""
@@ -89,8 +98,6 @@ class MetaRouter:
             path = plan["access_path"]
             params = path["params"]
             db_name = params.get("db", "OposicionesDB")
-            if "Biblia" in params.get("collection", ""):
-                 db_name = "Pioteca"
             
             db = self.mongo_client[db_name]
             coll = db[params["collection"]]
