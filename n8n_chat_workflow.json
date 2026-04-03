@@ -1,0 +1,90 @@
+{
+  "name": "Agente Chat Interface (MCP)",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "chat-trigger-id",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        380,
+        240
+      ],
+      "webhookId": "agente-chat-webhook-id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.AGENT_API_URL }}/api/v1/chat",
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.chatInput }}"
+            },
+            {
+              "name": "user_id",
+              "value": "n8n_chat_ui"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "agent-api-id",
+      "name": "Call Agent API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        600,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.answer }}",
+        "options": {}
+      },
+      "id": "chat-response-id",
+      "name": "Chat Response",
+      "type": "n8n-nodes-base.chatResponse",
+      "typeVersion": 1,
+      "position": [
+        820,
+        240
+      ]
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Call Agent API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Agent API": {
+      "main": [
+        [
+          {
+            "node": "Chat Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

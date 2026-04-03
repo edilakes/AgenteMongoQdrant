@@ -1,0 +1,627 @@
+{
+  "updatedAt": "2026-04-02T18:59:54.830Z",
+  "createdAt": "2026-04-02T18:42:10.111Z",
+  "id": "2UbTx5cZZl9MGl9V",
+  "name": "Agente Pure Context (Nativo) v4 (Biblia)",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "id": "chat-trigger-id-v8",
+      "name": "When chat message received",
+      "parameters": {
+        "options": {}
+      },
+      "position": [
+        0,
+        0
+      ],
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "agent-id-v8",
+      "name": "AI Agent",
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un agente experto con acceso a una biblioteca extensa en MongoDB y Qdrant. \n\nTU PROTOCOLO DE ESTUDIO (MANDATORIO):\n1. Primero, consulta siempre 'Qdrant Context Map' para buscar rutas sem\u00e1nticas directas.\n2. Si el tema es b\u00edblico, religioso o sobre textos sagrados, usa obligatoriamente 'MongoDB Biblia' para citar el cap\u00edtulo y vers\u00edculo exacto.\n3. Si el tema es sobre textos fundacionales o espirituales, usa 'MongoDB Itheca'.\n4. Usa 'MongoDB Reader' para documentos administrativos o legislativos encontrados en 'Context Map'.\n5. Fallback: Usa 'Qdrant Library' para b\u00fasqueda sem\u00e1ntica general si no hay una ruta clara.\n\nREGLAS DE RESPUESTA:\n- Responde siempre en espa\u00f1ol.\n- CITA siempre la fuente interna (Base de datos y Colecci\u00f3n) para demostrar que la respuesta sale de tu biblioteca.\n- No uses conocimiento general si la informaci\u00f3n debe estar en la biblioteca."
+        }
+      },
+      "position": [
+        280,
+        0
+      ],
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6
+    },
+    {
+      "id": "gemini-model-id-v8",
+      "name": "Google Gemini Chat Model",
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "position": [
+        140,
+        240
+      ],
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ODlqO5FnJjHcsGT0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "id": "memory-id-v8",
+      "name": "Simple Memory",
+      "parameters": {},
+      "position": [
+        280,
+        240
+      ],
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3
+    },
+    {
+      "id": "qdrant-router-id-v8",
+      "name": "Qdrant Context Map",
+      "parameters": {
+        "collectionName": "context_map",
+        "description": "Busca rutas sem\u00e1nticas directas. \u00dasala para temas legislativos y administrativos."
+      },
+      "position": [
+        480,
+        -120
+      ],
+      "type": "n8n-nodes-qdrant.qdrantTool",
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "luT3jOypuNOZXNkX",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "id": "qdrant-library-id-v8",
+      "name": "Qdrant Library",
+      "parameters": {
+        "collectionName": "doctrina_itheca",
+        "description": "B\u00fasqueda sem\u00e1ntica general cuando no hay una ruta espec\u00edfica."
+      },
+      "position": [
+        480,
+        0
+      ],
+      "type": "n8n-nodes-qdrant.qdrantTool",
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "luT3jOypuNOZXNkX",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "id": "mongodb-reader-id-v8",
+      "name": "MongoDB Reader",
+      "parameters": {
+        "collection": "={{ $parameter.collection }}",
+        "database": "OposicionesDB",
+        "description": "Recupera documentos de OposicionesDB. \u00dasala tras el Context Map.",
+        "operation": "find"
+      },
+      "position": [
+        480,
+        120
+      ],
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "tAHcWcGzNkjgWlwI",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "id": "mongodb-biblia-id-v8",
+      "name": "MongoDB Biblia",
+      "parameters": {
+        "collection": "Biblia",
+        "database": "Pioteca",
+        "description": "Busca textos b\u00edblicos. Usa el campo 'book' (ej: DEUTERONOMIO) y 'chapter'.",
+        "operation": "find"
+      },
+      "position": [
+        640,
+        -60
+      ],
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "tAHcWcGzNkjgWlwI",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "id": "mongodb-itheca-id-v8",
+      "name": "MongoDB Itheca",
+      "parameters": {
+        "collection": "knowledge_base",
+        "database": "itheca",
+        "description": "Busca textos fundacionales y de conocimiento general de la organizaci\u00f3n.",
+        "operation": "find"
+      },
+      "position": [
+        640,
+        60
+      ],
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "credentials": {
+        "mongoDb": {
+          "id": "tAHcWcGzNkjgWlwI",
+          "name": "MongoDB account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_languageModel"
+          }
+        ]
+      ]
+    },
+    "MongoDB Biblia": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "MongoDB Itheca": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "MongoDB Reader": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "Qdrant Context Map": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "Qdrant Library": {
+      "ai_tool": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_tool"
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "ai_memory"
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "AI Agent",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9ff890cd-4d0b-4833-ad02-84ddb9fbd7ea",
+  "activeVersionId": "9ff890cd-4d0b-4833-ad02-84ddb9fbd7ea",
+  "versionCounter": 11,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-02T18:42:10.116Z",
+      "createdAt": "2026-04-02T18:42:10.116Z",
+      "role": "workflow:owner",
+      "workflowId": "2UbTx5cZZl9MGl9V",
+      "projectId": "xu0f0mOsPbnABUa1",
+      "project": {
+        "updatedAt": "2025-05-25T11:09:40.522Z",
+        "createdAt": "2025-05-25T10:58:20.502Z",
+        "id": "xu0f0mOsPbnABUa1",
+        "name": "edi lakes <edilakes@hotmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "39bae3dd-0a77-4bbe-b6c9-7472d918e29b",
+        "projectRelations": [
+          {
+            "updatedAt": "2025-05-25T10:58:20.502Z",
+            "createdAt": "2025-05-25T10:58:20.502Z",
+            "userId": "39bae3dd-0a77-4bbe-b6c9-7472d918e29b",
+            "projectId": "xu0f0mOsPbnABUa1",
+            "user": {
+              "updatedAt": "2026-04-02T12:28:07.000Z",
+              "createdAt": "2025-05-25T10:58:19.974Z",
+              "id": "39bae3dd-0a77-4bbe-b6c9-7472d918e29b",
+              "email": "edilakes@hotmail.com",
+              "firstName": "edi",
+              "lastName": "lakes",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2025-05-25T11:10:06.748Z",
+                "personalization_survey_n8n_version": "1.93.0",
+                "companyType": "personal",
+                "reportedSource": "youtube"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "H1qLqgv8veOzeLGq",
+                "userActivatedAt": 1753107097473,
+                "npsSurvey": {
+                  "waitingForResponse": true,
+                  "ignoredCount": 1,
+                  "lastShownAt": 1775041436195
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2026-04-02",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": {
+    "updatedAt": "2026-04-02T18:59:54.832Z",
+    "createdAt": "2026-04-02T18:59:54.832Z",
+    "versionId": "9ff890cd-4d0b-4833-ad02-84ddb9fbd7ea",
+    "workflowId": "2UbTx5cZZl9MGl9V",
+    "nodes": [
+      {
+        "id": "chat-trigger-id-v8",
+        "name": "When chat message received",
+        "parameters": {
+          "options": {}
+        },
+        "position": [
+          0,
+          0
+        ],
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.1
+      },
+      {
+        "id": "agent-id-v8",
+        "name": "AI Agent",
+        "parameters": {
+          "options": {
+            "systemMessage": "Eres un agente experto con acceso a una biblioteca extensa en MongoDB y Qdrant. \n\nTU PROTOCOLO DE ESTUDIO (MANDATORIO):\n1. Primero, consulta siempre 'Qdrant Context Map' para buscar rutas sem\u00e1nticas directas.\n2. Si el tema es b\u00edblico, religioso o sobre textos sagrados, usa obligatoriamente 'MongoDB Biblia' para citar el cap\u00edtulo y vers\u00edculo exacto.\n3. Si el tema es sobre textos fundacionales o espirituales, usa 'MongoDB Itheca'.\n4. Usa 'MongoDB Reader' para documentos administrativos o legislativos encontrados en 'Context Map'.\n5. Fallback: Usa 'Qdrant Library' para b\u00fasqueda sem\u00e1ntica general si no hay una ruta clara.\n\nREGLAS DE RESPUESTA:\n- Responde siempre en espa\u00f1ol.\n- CITA siempre la fuente interna (Base de datos y Colecci\u00f3n) para demostrar que la respuesta sale de tu biblioteca.\n- No uses conocimiento general si la informaci\u00f3n debe estar en la biblioteca."
+          }
+        },
+        "position": [
+          280,
+          0
+        ],
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.6
+      },
+      {
+        "id": "gemini-model-id-v8",
+        "name": "Google Gemini Chat Model",
+        "parameters": {
+          "modelName": "models/gemini-1.5-flash-latest",
+          "options": {}
+        },
+        "position": [
+          140,
+          240
+        ],
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1
+      },
+      {
+        "id": "memory-id-v8",
+        "name": "Simple Memory",
+        "parameters": {},
+        "position": [
+          280,
+          240
+        ],
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3
+      },
+      {
+        "id": "qdrant-router-id-v8",
+        "name": "Qdrant Context Map",
+        "parameters": {
+          "collectionName": "context_map",
+          "credentials": {
+            "qdrantRestApi": {
+              "id": "luT3jOypuNOZXNkX",
+              "name": "Qdrant account"
+            }
+          },
+          "description": "Busca rutas sem\u00e1nticas directas. \u00dasala para temas legislativos y administrativos."
+        },
+        "position": [
+          480,
+          -120
+        ],
+        "type": "n8n-nodes-qdrant.qdrantTool",
+        "typeVersion": 1
+      },
+      {
+        "id": "qdrant-library-id-v8",
+        "name": "Qdrant Library",
+        "parameters": {
+          "collectionName": "doctrina_itheca",
+          "credentials": {
+            "qdrantRestApi": {
+              "id": "luT3jOypuNOZXNkX",
+              "name": "Qdrant account"
+            }
+          },
+          "description": "B\u00fasqueda sem\u00e1ntica general cuando no hay una ruta espec\u00edfica."
+        },
+        "position": [
+          480,
+          0
+        ],
+        "type": "n8n-nodes-qdrant.qdrantTool",
+        "typeVersion": 1
+      },
+      {
+        "id": "mongodb-reader-id-v8",
+        "name": "MongoDB Reader",
+        "parameters": {
+          "collection": "={{ $parameter.collection }}",
+          "credentials": {
+            "mongoDb": {
+              "id": "tAHcWcGzNkjgWlwI",
+              "name": "MongoDB account"
+            }
+          },
+          "database": "OposicionesDB",
+          "description": "Recupera documentos de OposicionesDB. \u00dasala tras el Context Map.",
+          "operation": "find"
+        },
+        "position": [
+          480,
+          120
+        ],
+        "type": "n8n-nodes-base.mongoDbTool",
+        "typeVersion": 1.2
+      },
+      {
+        "id": "mongodb-biblia-id-v8",
+        "name": "MongoDB Biblia",
+        "parameters": {
+          "collection": "Biblia",
+          "credentials": {
+            "mongoDb": {
+              "id": "tAHcWcGzNkjgWlwI",
+              "name": "MongoDB account"
+            }
+          },
+          "database": "Pioteca",
+          "description": "Busca textos b\u00edblicos. Usa el campo 'book' (ej: DEUTERONOMIO) y 'chapter'.",
+          "operation": "find"
+        },
+        "position": [
+          640,
+          -60
+        ],
+        "type": "n8n-nodes-base.mongoDbTool",
+        "typeVersion": 1.2
+      },
+      {
+        "id": "mongodb-itheca-id-v8",
+        "name": "MongoDB Itheca",
+        "parameters": {
+          "collection": "knowledge_base",
+          "credentials": {
+            "mongoDb": {
+              "id": "tAHcWcGzNkjgWlwI",
+              "name": "MongoDB account"
+            }
+          },
+          "database": "itheca",
+          "description": "Busca textos fundacionales y de conocimiento general de la organizaci\u00f3n.",
+          "operation": "find"
+        },
+        "position": [
+          640,
+          60
+        ],
+        "type": "n8n-nodes-base.mongoDbTool",
+        "typeVersion": 1.2
+      }
+    ],
+    "connections": {
+      "AI Agent": {
+        "main": [
+          []
+        ]
+      },
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_languageModel"
+            }
+          ]
+        ]
+      },
+      "MongoDB Biblia": {
+        "ai_tool": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_tool"
+            }
+          ]
+        ]
+      },
+      "MongoDB Itheca": {
+        "ai_tool": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_tool"
+            }
+          ]
+        ]
+      },
+      "MongoDB Reader": {
+        "ai_tool": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_tool"
+            }
+          ]
+        ]
+      },
+      "Qdrant Context Map": {
+        "ai_tool": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_tool"
+            }
+          ]
+        ]
+      },
+      "Qdrant Library": {
+        "ai_tool": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_tool"
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "ai_memory"
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "AI Agent",
+              "type": "main"
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "edi lakes",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-04-02T18:59:54.998Z",
+        "id": 19,
+        "workflowId": "2UbTx5cZZl9MGl9V",
+        "versionId": "9ff890cd-4d0b-4833-ad02-84ddb9fbd7ea",
+        "event": "activated",
+        "userId": "39bae3dd-0a77-4bbe-b6c9-7472d918e29b"
+      },
+      {
+        "createdAt": "2026-04-02T19:00:02.274Z",
+        "id": 20,
+        "workflowId": "2UbTx5cZZl9MGl9V",
+        "versionId": "9ff890cd-4d0b-4833-ad02-84ddb9fbd7ea",
+        "event": "activated",
+        "userId": "39bae3dd-0a77-4bbe-b6c9-7472d918e29b"
+      }
+    ]
+  }
+}

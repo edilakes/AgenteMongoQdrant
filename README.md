@@ -88,6 +88,24 @@ Para una visión detallada de la evolución y arquitectura del proyecto, consult
 - [Plan de GitHub y README](docs/plan_github_and_readme.md): Inicialización del repo y documentación raíz.
 - [Walkthrough de Subida a GitHub](docs/walkthrough_github_and_readme.md): Verificación de la sincronización remota.
 
+## 🔗 Integración con n8n
+
+El proyecto incluye un flujo de trabajo preparado para **n8n** que permite conectar el agente con cualquier disparador externo (Webhooks, Telegram, Slack, etc.).
+
+### Configuración del Workflow
+1.  Importa el archivo [n8n_workflow.json](n8n_workflow.json) en tu instancia de n8n.
+2.  Configura la variable de entorno `AGENT_API_URL` en n8n con la URL de tu backend (ej. `http://host.docker.internal:8000`).
+3.  El workflow expone un Webhook en la ruta `/agent/chat` (POST) que acepta:
+    ```json
+    {
+      "message": "¿Qué dice la norma X sobre Y?",
+      "user_id": "opcional_id_usuario"
+    }
+### Chat en Vivo (n8n Interface)
+1.  Importa el archivo [n8n_chat_workflow.json](n8n_chat_workflow.json).
+2.  Este flujo utiliza el nodo **Chat Trigger**, que te permite chatear directamente desde n8n.
+3.  Al abrir el flujo, haz clic en el icono de **Chat** en la parte inferior derecha de n8n para probarlo.
+
 ---
 
 ## 📄 Licencia
